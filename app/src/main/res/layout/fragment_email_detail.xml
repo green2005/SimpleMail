@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.constraint.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:android="http://schemas.android.com/apk/res/android"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="match_parent"
+                                             android:id="@+id/clamain" android:visibility="visible"
+                                             tools:visibility="visible">
+
+    <ProgressBar android:layout_width="32dp"
+                 android:layout_height="32dp"
+                 android:id="@+id/progress"
+                 android:indeterminate="false"
+                 android:visibility="visible"
+
+                 app:layout_constraintStart_toStartOf="parent"
+                 app:layout_constraintEnd_toEndOf="parent"
+
+                 app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="16dp"
+                 android:layout_marginBottom="32dp" app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+        <ScrollView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" android:layout_marginTop="8dp"
+        >
+            <android.support.constraint.ConstraintLayout android:layout_width="match_parent"
+                                                         android:layout_height="match_parent"
+                                                         android:id="@+id/constraintLayout">
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="21dp"
+                        android:id="@+id/tvTitle"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="8dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginEnd="8dp"
+                        android:text="title"
+                        app:layout_constraintHorizontal_bias="0.021"
+                        android:textSize="16sp" android:layout_marginTop="8dp"
+                        app:layout_constraintTop_toTopOf="parent"/>
+                <TextView
+                        android:id="@+id/tvAuthor"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="author"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginEnd="8dp" app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="8dp" app:layout_constraintTop_toBottomOf="@+id/tvTitle"
+                        android:layout_marginTop="12dp"
+                        app:layout_constraintHorizontal_bias="0.022"/>
+
+                <TextView
+                        android:id="@+id/tvDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="date"
+
+
+                        app:layout_constraintTop_toBottomOf="@+id/tvAuthor" app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginEnd="8dp" app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="8dp" app:layout_constraintHorizontal_bias="0.021"
+                        android:layout_marginTop="8dp"/>
+
+
+                <WebView android:layout_width="0dp"
+                         android:layout_height="wrap_content"
+                         android:id="@+id/wvContent"
+                         app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="16dp"
+                         app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="16dp"
+                         app:layout_constraintTop_toBottomOf="@+id/tvDate"
+                         app:layout_constraintHorizontal_bias="0.0"
+                         android:layout_marginTop="8dp" app:layout_constraintBottom_toBottomOf="parent"
+                         android:layout_marginBottom="8dp"/>
+
+            </android.support.constraint.ConstraintLayout>
+        </ScrollView>
+
+</android.support.constraint.ConstraintLayout>

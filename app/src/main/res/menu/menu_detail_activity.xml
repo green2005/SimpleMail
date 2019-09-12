@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+            android:id="@+id/reply"
+            android:icon="@drawable/reply"
+            android:title="@string/reply"
+            app:showAsAction="always" />
+    <item
+            android:id="@+id/deleteMail"
+            android:icon="@drawable/trash"
+            android:title="@string/delete"
+            app:showAsAction="always" />
+    <item
+            android:id="@+id/setUnread"
+            android:title="@string/set_unread"
+            app:showAsAction="never" />
+
+
+</menu>

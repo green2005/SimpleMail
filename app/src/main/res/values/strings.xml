@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">simpleMailApp</string>
+    <string name="ok">OK</string>
+    <string name="cancel">cancel</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_tools">Tools</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_send">Send</string>
+
+    <string name="password">password</string>
+    <string name="subject">subject</string>
+    <string name="destination">destination</string>
+    <string name="sendemail">sendEmail</string>
+    <string name="add_attachment">Add attachment</string>
+    <string name="content">content</string>
+    <string name="msg_sent">Message sent</string>
+    <string name="delete">Delete</string>
+    <string name="set_unread">Mark unread</string>
+    <string name="reply">Reply</string>
+    <string name="c_err_Account_Exists">Account already exists</string>
+
+</resources>
