@@ -2,4 +2,4 @@ package by.green.simplemail.db
 
 public enum class EmailContentType { HTML, TXT, FILE }
 
-public class EmailContentPart(val content: String, val contentType: EmailContentType)
+public class EmailContentPart(val content: String, val contentType: EmailContentType, val sectionId:Int = -1)

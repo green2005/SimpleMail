@@ -1,7 +1,16 @@
 package by.green.simplemail
 
+import android.content.Context
+import android.os.Environment
+import android.os.Handler
 import by.green.simplemail.db.*
+import com.sun.mail.imap.IMAPBodyPart
 import com.sun.mail.imap.IMAPMessage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.mail.*
@@ -15,7 +24,8 @@ import kotlin.collections.ArrayList
 class EmailsIOHelper() {
     private val IMAPS = "imaps"
     private val MSGS_COUNT = 15
-    private val VIEW_PORT_TAG = "<meta name=\"viewport\" content='width=device-width, initial-scale=1.0,text/html,charset=utf-8'>"
+    private val VIEW_PORT_TAG =
+        "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no\">"
 
     private fun getSMTPSession(emailAccount: EmailAccount, isIncoming: Boolean = true): Session? {
         val props = System.getProperties()
@@ -162,7 +172,7 @@ class EmailsIOHelper() {
             } else {
                 msgStartFrom
             }
-//store?.defaultFolder?.list("*").get(5).urlName.file.toString()
+
             while (j++ < MSGS_COUNT) {
                 val msgNom = i - j
                 if (msgNom > 0) {
@@ -183,6 +193,10 @@ class EmailsIOHelper() {
                     } else {
                         subj = String(msg.subject.toByteArray(charset("UTF-8")), charset("UTF-8"))
                     }
+                    val d1 = msg.receivedDate
+                    var dt = ""
+                    if (d1 != null)
+                        dt = dateFormat.format(d1)
 
                     val email = Email(
                         folderId = folder.id ?: 0,
@@ -190,7 +204,7 @@ class EmailsIOHelper() {
                         folderName = folder.name,
                         email_id = uf.getUID(msg).toString(), //folder.email,
                         subject = subj,
-                        date = dateFormat.format(msg.sentDate),
+                        date = dt,
                         from_title = from,
                         from_email = from_email,
                         msgNum = msg.messageNumber,
@@ -225,7 +239,7 @@ class EmailsIOHelper() {
             val msg = uf.getMessageByUID(emailID)
             var s: String = ""
             if (msg.isMimeType("text/html")) {
-                s = msg.getContent().toString()
+                s = getViewPortOptimized(msg.getContent().toString())
                 list.add(EmailContentPart(s, EmailContentType.HTML))
             } else
                 if (msg.isMimeType("text/plain")) {
@@ -243,6 +257,96 @@ class EmailsIOHelper() {
         return list
     }
 
+    private fun decodeFileName(bodyPart: BodyPart): String {
+        return if ((bodyPart as IMAPBodyPart).encoding.contentEquals("base64")) {
+            return bodyPart.fileName.decodeBase64()
+        } else bodyPart.fileName
+    }
+
+    fun showEmailAttachment(
+        context: Context,
+        email: Email,
+        account: EmailAccount,
+        onError: (errStr: String) -> Unit,
+        attachmentId: Int
+    ) {
+        val scope = CoroutineScope(Dispatchers.IO)
+        val h = Handler()
+        scope.async {
+            var store: Store? = null
+            try {
+                val session = getSMTPSession(emailAccount = account)
+                store = session?.getStore(IMAPS)
+                store?.connect(account.incomingServer, account.email, account.pwd)
+                val f = store?.getFolder(email.folderUrl) ?: return@async
+                f.open(Folder.READ_ONLY)
+                val uf = f as UIDFolder
+                val emailID = email.email_id.toString().toLong()
+                val msg = uf.getMessageByUID(emailID)
+                var fullFileName: String = ""
+                if (msg.isMimeType("multipart/*")) {
+                    val mimeMultipart = msg.getContent() as MimeMultipart
+                    val count = mimeMultipart.count
+                    for (i: Int in count - 1 downTo 0) {
+                        val bodyPart = mimeMultipart.getBodyPart(i)
+                        if ((bodyPart.fileName != null) && (attachmentId == bodyPart.fileName.hashCode())) {
+                            //bodyPart.inputStream.
+                            context.packageManager.getPackageInfo(context.packageName, 0)
+                                .applicationInfo.dataDir
+                            context.filesDir
+                            val filesDir = File(
+                                Environment.getExternalStorageDirectory().absolutePath + "/" + context.packageManager.getPackageInfo(
+                                    context.packageName,
+                                    0
+                                ).applicationInfo.packageName
+                            )
+                            filesDir.mkdirs()
+                            for (f in filesDir.listFiles()) {
+                                if (f.isFile)
+                                    f.delete()
+                            }
+
+                            //context.cacheDir
+                            val fileName = decodeFileName(bodyPart)
+                            val ext = "." + File(fileName).extension
+                            val name = File(fileName).name.removeSuffix(".$ext")
+                            //val outFile =
+                            //    File(filesDir.absolutePath+"/"+name)
+                            //val outFile = File(filesDir, name+"."+"."+ext) //File(filesDir, "$name.$ext")
+                            //val outFile = File(filesDir.absolutePath, name+"."+ext)
+                            val outFile = File.createTempFile(name.removeSuffix(ext), ext, filesDir)
+
+                            outFile.mkdirs()
+                            outFile.createNewFile()
+                            outFile.setWritable(true)
+                            //val outFile = File.createTempFile(name, "", cacheDir)
+                            fullFileName = outFile.absolutePath
+                            val outStream = FileOutputStream(outFile)
+                            bodyPart.inputStream.copyTo(outStream)
+                            outStream.flush()
+                            bodyPart.inputStream.close()
+                            break
+                        }
+                    }
+                }
+
+                f.close(true)
+                h.post(
+                    Runnable {
+                        if (fullFileName.isNotEmpty()) {
+                            val file = File(fullFileName)
+                            file.open(context, onError)
+                        }
+
+                    }
+                )
+            } catch (e: Exception) {
+                onError(e.message ?: e.toString())
+            }
+            store?.close()
+        }
+    }
+
     private fun addEmailFromMimeMultipart(
         mimeMultipart: MimeMultipart,
         list: ArrayList<EmailContentPart>
@@ -254,21 +358,29 @@ class EmailsIOHelper() {
             if (bodyPart.isMimeType("text/plain")) {
                 list.add(EmailContentPart(bodyPart.content.toString(), EmailContentType.TXT))
             } else if (bodyPart.isMimeType("text/html")) {
-                val html =  getViewPortOptimized(bodyPart.content as String)
+                val html = getViewPortOptimized(bodyPart.content as String)
                 list.add(EmailContentPart(html, EmailContentType.HTML))
                 break
             } else if (bodyPart.content is MimeMultipart) {
                 result += addEmailFromMimeMultipart(bodyPart.content as MimeMultipart, list)
+            } else if (bodyPart.fileName.isNotEmpty()) {
+                list.add(
+                    EmailContentPart(
+                        decodeFileName(bodyPart),
+                        EmailContentType.FILE,
+                        bodyPart.fileName.hashCode()
+                    )
+                )
             }
         }
         return result
     }
 
-    private fun getViewPortOptimized(html:String):String{
-        if (html.contains("\"viewport\"")){
-            return html
+    private fun getViewPortOptimized(html: String): String {
+        return if (html.contains("\"viewport\"")) {
+            html
         } else
-            return html.replace("<head>", "<head>$VIEW_PORT_TAG")
+            html.replace("<head>", "<head>$VIEW_PORT_TAG")
     }
 
     fun checkAccount(account: EmailAccount, onError: (errStr: String) -> Unit): Boolean {

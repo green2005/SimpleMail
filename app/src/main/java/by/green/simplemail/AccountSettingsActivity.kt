@@ -3,9 +3,9 @@ package by.green.simplemail
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
+import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Menu
@@ -51,7 +51,6 @@ class AccountSettingsActivity : AppCompatActivity() {
     private lateinit var mOutServerEdit: EditText
     private lateinit var mOutPortEdit: EditText
 
-    private val mPattern = Pattern.compile("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +59,7 @@ class AccountSettingsActivity : AppCompatActivity() {
         val drawable = ContextCompat.getDrawable(this, R.drawable.cancel_circle)
         toolbar.navigationIcon = drawable
         setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
         mEmailEdit = findViewById(R.id.emailEdit)
         mPwdEdit = findViewById(R.id.pwdEdit)
@@ -94,7 +94,7 @@ class AccountSettingsActivity : AppCompatActivity() {
         }
 
         if (requestCode == C_EDIT_ACCOUNT) {
-            val account = intent.getParcelableExtra<EmailAccount>(C_ACCOUNT)
+            val account = intent.getParcelableExtra<EmailAccount>(C_ACCOUNT)?:return
             mEmailEdit.setText(account.email)
             mPwdEdit.setText(account.pwd)
             mInServerEdit.setText(account.incomingServer)

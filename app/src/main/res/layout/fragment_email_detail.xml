@@ -1,80 +1,126 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.constraint.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
-                                             xmlns:android="http://schemas.android.com/apk/res/android"
-                                             xmlns:tools="http://schemas.android.com/tools"
-                                             android:layout_width="match_parent"
-                                             android:layout_height="match_parent"
-                                             android:id="@+id/clamain" android:visibility="visible"
-                                             tools:visibility="visible">
-
-    <ProgressBar android:layout_width="32dp"
-                 android:layout_height="32dp"
-                 android:id="@+id/progress"
-                 android:indeterminate="false"
-                 android:visibility="visible"
-
-                 app:layout_constraintStart_toStartOf="parent"
-                 app:layout_constraintEnd_toEndOf="parent"
-
-                 app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="16dp"
-                 android:layout_marginBottom="32dp" app:layout_constraintBottom_toBottomOf="parent"/>
-
-
-        <ScrollView android:layout_width="match_parent" android:layout_height="wrap_content"
-                    app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" android:layout_marginTop="8dp"
-        >
-            <android.support.constraint.ConstraintLayout android:layout_width="match_parent"
-                                                         android:layout_height="match_parent"
-                                                         android:id="@+id/constraintLayout">
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="21dp"
-                        android:id="@+id/tvTitle"
-                        app:layout_constraintStart_toStartOf="parent"
-                        android:layout_marginStart="8dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        android:layout_marginEnd="8dp"
-                        android:text="title"
-                        app:layout_constraintHorizontal_bias="0.021"
-                        android:textSize="16sp" android:layout_marginTop="8dp"
-                        app:layout_constraintTop_toTopOf="parent"/>
-                <TextView
-                        android:id="@+id/tvAuthor"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="author"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        android:layout_marginEnd="8dp" app:layout_constraintStart_toStartOf="parent"
-                        android:layout_marginStart="8dp" app:layout_constraintTop_toBottomOf="@+id/tvTitle"
-                        android:layout_marginTop="12dp"
-                        app:layout_constraintHorizontal_bias="0.022"/>
-
-                <TextView
-                        android:id="@+id/tvDate"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="date"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/clamain"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        tools:visibility="visible">
+<!--
+    <include
+            android:id="@+id/la1"
+            layout="@layout/attachment_item"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/scrollView" />
+-->
 
 
-                        app:layout_constraintTop_toBottomOf="@+id/tvAuthor" app:layout_constraintEnd_toEndOf="parent"
-                        android:layout_marginEnd="8dp" app:layout_constraintStart_toStartOf="parent"
-                        android:layout_marginStart="8dp" app:layout_constraintHorizontal_bias="0.021"
-                        android:layout_marginTop="8dp"/>
+
+    <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="32dp"
+
+            android:indeterminate="false"
+            android:visibility="visible"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
-                <WebView android:layout_width="0dp"
-                         android:layout_height="wrap_content"
-                         android:id="@+id/wvContent"
-                         app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="16dp"
-                         app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="16dp"
-                         app:layout_constraintTop_toBottomOf="@+id/tvDate"
-                         app:layout_constraintHorizontal_bias="0.0"
-                         android:layout_marginTop="8dp" app:layout_constraintBottom_toBottomOf="parent"
-                         android:layout_marginBottom="8dp"/>
+    <ScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            </android.support.constraint.ConstraintLayout>
-        </ScrollView>
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraintLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-</android.support.constraint.ConstraintLayout>
+            <TextView
+                    android:id="@+id/tvTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="21dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="title"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.021"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+            <TextView
+                    android:id="@+id/tvAuthor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="author"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.022"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+
+            <TextView
+                    android:id="@+id/tvDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="date"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.021"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvAuthor" />
+
+            <LinearLayout
+                    android:id="@+id/lvAttachments"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvDate" />
+
+            <WebView
+                    android:id="@+id/wvContent"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/lvAttachments" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

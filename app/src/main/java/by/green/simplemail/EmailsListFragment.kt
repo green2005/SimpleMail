@@ -1,17 +1,17 @@
 package by.green.simplemail
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.constraint.ConstraintLayout
-import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.RecyclerView.VERTICAL
-import android.support.v7.widget.helper.ItemTouchHelper
+import androidx.constraintlayout.widget.ConstraintLayout
+import com.google.android.material.snackbar.Snackbar
+import androidx.fragment.app.Fragment
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.VERTICAL
+import androidx.recyclerview.widget.ItemTouchHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,7 +24,7 @@ interface EmailsViewObserver {
     fun getEmailObserver(): Observer<List<Email>>
 }
 
-class EmailsListFragment : Fragment(), EmailsViewObserver {
+class EmailsListFragment : androidx.fragment.app.Fragment(), EmailsViewObserver {
 
     private enum class DataState {
         LOADING,
@@ -34,7 +34,7 @@ class EmailsListFragment : Fragment(), EmailsViewObserver {
 
     private var mObserver: Observer<List<Email>>? = null
     private var mAdapter: EmailListAdapter? = null
-    private lateinit var mSwipeLayout: SwipeRefreshLayout
+    private lateinit var mSwipeLayout: androidx.swiperefreshlayout.widget.SwipeRefreshLayout
     private lateinit var mEmailsPresenter: EmailsPresenter
     private var mState: DataState = DataState.BROWSING
     private lateinit var mProgressPanel: ConstraintLayout
@@ -90,9 +90,10 @@ class EmailsListFragment : Fragment(), EmailsViewObserver {
                 }
             }
         mAdapter = EmailListAdapter(activity, emailsUIListener)
-        val rvEmails = view.findViewById(R.id.rvEmails) as RecyclerView
-        rvEmails.layoutManager = LinearLayoutManager(this.activity)
-        val dividerItemDecor = DividerItemDecoration(activity, VERTICAL)
+        val rvEmails = view.findViewById(R.id.rvEmails) as androidx.recyclerview.widget.RecyclerView
+        rvEmails.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this.activity)
+        val dividerItemDecor =
+            androidx.recyclerview.widget.DividerItemDecoration(activity, VERTICAL)
         rvEmails.addItemDecoration(dividerItemDecor)
         rvEmails.adapter = mAdapter
         val onItemSwipeListener: EmailsItemTouchHelper.SwipeListsener =

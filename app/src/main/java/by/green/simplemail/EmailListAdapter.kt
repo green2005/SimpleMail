@@ -2,7 +2,7 @@ package by.green.simplemail
 
 import android.content.Context
 import android.graphics.Typeface
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +15,7 @@ interface HiddenEmailProvider {
 }
 
 class EmailListAdapter(val context: Context?, val listener: EmailsListListener) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>(),HiddenEmailProvider {
+    androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>(),HiddenEmailProvider {
 
     interface EmailsListListener {
         fun onBottomScrolled(msgNum: Int?)
@@ -49,13 +49,13 @@ class EmailListAdapter(val context: Context?, val listener: EmailsListListener) 
         mHiddenIndex = -1
     }
 
-    private class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    private class VH(itemView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
         var tvDate: TextView? = itemView.findViewById(R.id.tvDate)
         var tvTitle: TextView? = itemView.findViewById(R.id.tvTitle)
         var tvSender: TextView? = itemView.findViewById(R.id.tvAuthor)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder {
         val view = mInflater.inflate(R.layout.item_email_list, parent, false)
         val vh = VH(view)
         view.setOnClickListener {
@@ -88,7 +88,7 @@ class EmailListAdapter(val context: Context?, val listener: EmailsListListener) 
             (mEmails?.size?.minus(1) ?: 0)
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {
         val vh = (holder as VH)
         val email = getItem(position) //mEmails?.get(position)
         vh.tvDate?.text = email?.date

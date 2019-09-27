@@ -1,7 +1,7 @@
 package by.green.simplemail
 
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.Observer
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
 import android.content.Context
 import by.green.simplemail.db.Email
 import by.green.simplemail.db.EmailAccount
@@ -26,6 +26,8 @@ interface EmailsPresenter {
     fun setEmailRead(email: Email, isRead: Boolean)
     fun showEmailDetails(email: Email, context: Context)
 
+    fun showEmailAttachment(context: Context, email: Email, attachmentId:Int, onResult:(String) ->Unit)
+
     fun sendEmail(
         subject: String,
         dest: String,
@@ -37,7 +39,7 @@ interface EmailsPresenter {
 interface EmailsView {
     fun getAccountsObserver(): Observer<List<EmailAccount>>
     fun getFoldersObserver(emailAccount: EmailAccount): Observer<List<EmailFolder>>
-    fun getEmailsObserver(folder: EmailFolder): Observer<List<Email>>
+    fun getEmailsObserver(folder: EmailFolder): Observer<List<Email>>?
     fun getLifeCycleOwner(): LifecycleOwner
 }
 
@@ -46,7 +48,7 @@ interface EmailDetailsView {
 }
 
 interface EmailsRepository {
-    fun setCurrentEmailAccount(account: EmailAccount)
+    fun setCurrentEmailAccount(account: EmailAccount?)
     fun getCurrentEmailAccount(): EmailAccount?
 
     fun addEmailAccount(account: EmailAccount)
@@ -96,5 +98,7 @@ interface EmailsRepository {
         content: String,
         onSendResult: (String) -> Unit
     )
+
+    fun showEmailAttachment(context: Context, email:Email, account: EmailAccount, attachmentId: Int, onResult:(String) ->Unit )
 
 }

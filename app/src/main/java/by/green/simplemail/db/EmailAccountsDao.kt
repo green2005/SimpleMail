@@ -1,8 +1,8 @@
 package by.green.simplemail.db
 
-import android.arch.lifecycle.LiveData
-import android.arch.persistence.room.*
-import android.arch.persistence.room.OnConflictStrategy.IGNORE
+import androidx.lifecycle.LiveData
+import androidx.room.*
+import androidx.room.OnConflictStrategy.IGNORE
 
 @Dao
 interface EmailAccountsDao {

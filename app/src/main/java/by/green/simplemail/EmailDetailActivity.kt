@@ -1,12 +1,12 @@
 package by.green.simplemail
 
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.ViewModelProviders
 import by.green.simplemail.db.Email
 
 
@@ -18,7 +18,7 @@ class EmailDetailActivity : AppCompatActivity() {
     }
 
     private lateinit var mEmail: Email
-    private lateinit var mFm:EmailDetailFragment
+    private lateinit var mFm: EmailDetailFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,8 +26,9 @@ class EmailDetailActivity : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        mEmail = intent.extras.getParcelable(EmailDetailActivity.EMAIL) as Email
+        mEmail = intent.extras?.getParcelable(EmailDetailActivity.EMAIL) ?: return as Email
         mFm = EmailDetailFragment.getFragment(intent.extras)
         val tran = supportFragmentManager.beginTransaction()
         tran.replace(R.id.frame, mFm)

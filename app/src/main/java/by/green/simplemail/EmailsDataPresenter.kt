@@ -1,8 +1,9 @@
 package by.green.simplemail
 
-import android.arch.lifecycle.ViewModel
 import android.content.Context
 import android.content.Intent
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import by.green.simplemail.db.Email
 import by.green.simplemail.db.EmailAccount
 import by.green.simplemail.db.EmailContentPart
@@ -17,52 +18,59 @@ class EmailsDataPresenter : EmailsPresenter, ViewModel() {
     private var mView: EmailsView? = null
     private var mDetailsView: EmailDetailsView? = null
 
+    private fun getEmailsRepository(): EmailsRepository? {
+        return App.getEmailsRepository()
+    }
+
     override fun getCurrentAccount(): EmailAccount? {
-        return App.getEmailsRepository()?.getCurrentEmailAccount()
+        return getEmailsRepository()?.getCurrentEmailAccount()
     }
 
     override fun onViewActiveAccountChanged(account: EmailAccount) {
-        if ((App.getEmailsRepository()?.getCurrentEmailAccount() == null) ||
-            (App.getEmailsRepository()?.getCurrentEmailAccount() != account)
+        if ((getEmailsRepository()?.getCurrentEmailAccount() == null) ||
+            (getEmailsRepository()?.getCurrentEmailAccount() != account)
         ) {
             account.isActive = 1
-            App.getEmailsRepository()?.setCurrentEmailAccount(account)
+            getEmailsRepository()?.setCurrentEmailAccount(account)
             onRequestFolders()
         }
     }
 
     override fun onViewCreated(view: EmailsView) {
         mView = view
-        App.getEmailsRepository()?.addEmailAccountObserver(
+        getEmailsRepository()?.addEmailAccountObserver(
             mView?.getLifeCycleOwner() ?: return,
             mView?.getAccountsObserver() ?: return
         )
     }
 
     override fun onViewDestroyed() {
-        App.getEmailsRepository()?.removeObservers(mView?.getLifeCycleOwner() ?: return)
+        getEmailsRepository()?.removeObservers(mView?.getLifeCycleOwner() ?: return)
+        getEmailsRepository()?.setCurrentEmailAccount(null)
         mView = null
     }
 
     override fun onEmailAccountAdded(account: EmailAccount) {
-        App.getEmailsRepository()?.addEmailAccount(account)
-        // App.getEmailsRepository()?.setCurrentEmailAccount(account)
+        getEmailsRepository()?.addEmailAccount(account)
+        // getEmailsRepository()?.setCurrentEmailAccount(account)
     }
 
     override fun onEmailAccountEdit(account: EmailAccount) {
-        App.getEmailsRepository()?.updateAccount(account)
-        App.getEmailsRepository()?.setCurrentEmailAccount(account)
+        getEmailsRepository()?.updateAccount(account)
+        getEmailsRepository()?.setCurrentEmailAccount(account)
     }
 
     override fun onRequestFolders() {
-        App.getEmailsRepository()?.addFoldersObserver(
+        getEmailsRepository()?.addFoldersObserver(
             mView?.getLifeCycleOwner() ?: return,
-            mView?.getFoldersObserver(App.getEmailsRepository()?.getCurrentEmailAccount() ?: return)
+            mView?.getFoldersObserver(getEmailsRepository()?.getCurrentEmailAccount() ?: return)
                 ?: return,
-            App.getEmailsRepository()?.getCurrentEmailAccount() ?: return
+            getEmailsRepository()?.getCurrentEmailAccount() ?: return
         )
-        App.getEmailsRepository()
-            ?.requestFolders(App.getEmailsRepository()?.getCurrentEmailAccount() ?: return)
+
+
+        getEmailsRepository()
+            ?.requestFolders(getEmailsRepository()?.getCurrentEmailAccount() ?: return)
     }
 
     override fun onRequestEmails(
@@ -72,15 +80,16 @@ class EmailsDataPresenter : EmailsPresenter, ViewModel() {
     ) {
         val observer = mView?.getEmailsObserver(
             folder
-        )
-        App.getEmailsRepository()?.addEmailsObserver(
+        ) ?: return
+
+        getEmailsRepository()?.addEmailsObserver(
             mView?.getLifeCycleOwner() ?: return,
             observer ?: return, folder
         )
 
-        App.getEmailsRepository()
+        getEmailsRepository()
             ?.requestEmails(
-                App.getEmailsRepository()?.getCurrentEmailAccount() ?: return,
+                getEmailsRepository()?.getCurrentEmailAccount() ?: return,
                 folder,
                 msgsStartFrom,
                 onError
@@ -99,8 +108,8 @@ class EmailsDataPresenter : EmailsPresenter, ViewModel() {
             mDetailsView?.showEmailDetails(lst)
         }
 
-        App.getEmailsRepository()?.getCurrentEmailAccount()?.let {
-            App.getEmailsRepository()?.fillEmailDetails(
+        getEmailsRepository()?.getCurrentEmailAccount()?.let {
+            getEmailsRepository()?.fillEmailDetails(
                 email,
                 it,
                 onSuccess
@@ -113,15 +122,15 @@ class EmailsDataPresenter : EmailsPresenter, ViewModel() {
     }
 
     override fun deleteEmail(email: Email) {
-        App.getEmailsRepository()
-            ?.deleteEmail(email, App.getEmailsRepository()?.getCurrentEmailAccount() ?: return)
+        getEmailsRepository()
+            ?.deleteEmail(email, getEmailsRepository()?.getCurrentEmailAccount() ?: return)
     }
 
     override fun setEmailRead(email: Email, isRead: Boolean) {
-        App.getEmailsRepository()
+        getEmailsRepository()
             ?.setEmailRead(
                 email,
-                App.getEmailsRepository()?.getCurrentEmailAccount() ?: return,
+                getEmailsRepository()?.getCurrentEmailAccount() ?: return,
                 isRead
             )
     }
@@ -138,7 +147,22 @@ class EmailsDataPresenter : EmailsPresenter, ViewModel() {
         content: String,
         onSendResult: (String) -> Unit
     ) {
-        App.getEmailsRepository()?.sendEmail(subject, dest, content, onSendResult)
+        getEmailsRepository()?.sendEmail(subject, dest, content, onSendResult)
+    }
+
+    override fun showEmailAttachment(
+        context: Context,
+        email: Email,
+        attachmentId: Int,
+        onResult: (String) -> Unit
+    ) {
+        getEmailsRepository()?.showEmailAttachment(
+            context,
+            email,
+            getEmailsRepository()?.getCurrentEmailAccount() ?: return,
+            attachmentId,
+            onResult
+        )
     }
 
 }

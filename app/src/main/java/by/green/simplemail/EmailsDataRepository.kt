@@ -1,9 +1,10 @@
 package by.green.simplemail
 
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.Observer
 import android.content.Context
 import android.os.Handler
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import by.green.simplemail.db.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -11,10 +12,11 @@ import kotlinx.coroutines.async
 
 class EmailsDataRepository(val appContext: Context) : EmailsRepository {
 
+
     private var mDB: EmailsDB? = null
     private var mEmailsIOHelper: EmailsIOHelper? = null
-    private var mFolderObservers: HashMap<Long, Observer<List<EmailFolder>>> = HashMap()
-    private var mEmailsObservers: HashMap<Long, Observer<List<Email>>> = HashMap()
+    private var mFolderObservers: HashMap<Long, LiveData<List<EmailFolder>>> = HashMap()
+    private var mEmailsObservers: HashMap<Long, LiveData<List<Email>>> = HashMap()
     private var mCurrentEmailAccount: EmailAccount? = null
 
     private fun getDB(): EmailsDB? {
@@ -71,15 +73,10 @@ class EmailsDataRepository(val appContext: Context) : EmailsRepository {
         folder: EmailFolder
     ) {
         if (mEmailsObservers.containsKey(folder.id)) return
-        for (key in mEmailsObservers.keys) {
-            val observer = mEmailsObservers[key]
-            if (observer != null) {
-                getDB()?.email()?.getEmails(key)?.removeObserver(observer)
-            }
-        }
-        mEmailsObservers.clear()
-        mEmailsObservers.put(folder.id ?: 0, observer)
-        getDB()?.email()?.getEmails(folder.id ?: 0)?.observe(lifecycleOwner, observer)
+        clearEmailObservers(lifecycleOwner)
+        val liveData = getDB()?.email()?.getEmails(folder.id ?: 0) ?: return
+        mEmailsObservers.put(folder.id ?: 0, liveData)
+        liveData.observe(lifecycleOwner, observer)
     }
 
     override fun addFoldersObserver(
@@ -89,23 +86,32 @@ class EmailsDataRepository(val appContext: Context) : EmailsRepository {
     ) {
         if (mFolderObservers[emailAccount.id ?: 0] != null) return
 
-        for (key in mFolderObservers.keys) {
-            val observer = mFolderObservers.get(key)
-            if (observer != null) {
-                getDB()?.emailFolders()?.getFolders(key)?.removeObserver(observer)
-            }
-        }
-        mFolderObservers.clear()
-        mFolderObservers.put(emailAccount.id ?: 0, observer)
+        clearFolderObservers(lifecycleOwner)
         emailAccount.id?.let {
-            getDB()?.emailFolders()?.getFolders(it)?.observe(lifecycleOwner, observer)
+            val liveData = getDB()?.emailFolders()?.getFolders(it) ?: return
+            liveData.observe(lifecycleOwner, observer)
+            mFolderObservers.put(emailAccount.id ?: 0, liveData)
         }
     }
 
-    override fun removeObservers(owner: LifecycleOwner) {
-        getDB()?.emailAccounts()?.getAccounts()?.removeObservers(owner)
+    private fun clearFolderObservers(owner: LifecycleOwner) {
+        for (liveData in mFolderObservers.values) {
+            liveData.removeObservers(owner)
+        }
         mFolderObservers.clear()
+    }
+
+    private fun clearEmailObservers(lifecycleOwner: LifecycleOwner) {
+        for (liveData in mEmailsObservers.values) {
+            liveData.removeObservers(lifecycleOwner)
+        }
         mEmailsObservers.clear()
+    }
+
+    override fun removeObservers(owner: LifecycleOwner) {
+        clearFolderObservers(owner)
+        clearEmailObservers(owner)
+        getDB()?.emailAccounts()?.getAccounts()?.removeObservers(owner)
     }
 
     override fun requestFolders(emailAccount: EmailAccount) {
@@ -179,18 +185,19 @@ class EmailsDataRepository(val appContext: Context) : EmailsRepository {
 
         }
         val scope = CoroutineScope(Dispatchers.IO)
-
         scope.async {
             getIOHelper()?.deleteEmail(account, onError, email)
             getDB()?.email()?.deleteEmail(email.id ?: 0)
         }
     }
 
-    override fun setCurrentEmailAccount(account: EmailAccount) {
+    override fun setCurrentEmailAccount(account: EmailAccount?) {
         mCurrentEmailAccount = account
-        val scope = CoroutineScope(Dispatchers.IO)
-        scope.async {
-            getDB()?.emailAccounts()?.setActiveAccount(account.id ?: -1)
+        if (account != null) {
+            val scope = CoroutineScope(Dispatchers.IO)
+            scope.async {
+                getDB()?.emailAccounts()?.setActiveAccount(account.id ?: -1)
+            }
         }
     }
 
@@ -214,6 +221,14 @@ class EmailsDataRepository(val appContext: Context) : EmailsRepository {
                 onSendResult
             )
         }
+    }
+
+    override fun showEmailAttachment(
+        context: Context,
+        email: Email, account: EmailAccount,
+        attachmentId: Int, onResult: (String) -> Unit
+    ) {
+        getIOHelper()?.showEmailAttachment(context, email, account, onResult, attachmentId)
     }
 
 }

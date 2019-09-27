@@ -4,9 +4,9 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.helper.ItemTouchHelper
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ItemTouchHelper
 
 class EmailsItemTouchHelper(
     dragDirs: Int,
@@ -25,8 +25,8 @@ class EmailsItemTouchHelper(
 
     override fun onChildDraw(
         c: Canvas,
-        recyclerView: RecyclerView,
-        viewHolder: RecyclerView.ViewHolder,
+        recyclerView: androidx.recyclerview.widget.RecyclerView,
+        viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder,
         dX: Float,
         dY: Float,
         actionState: Int,
@@ -80,14 +80,14 @@ class EmailsItemTouchHelper(
 
 
     override fun onMove(
-        p0: RecyclerView,
-        p1: RecyclerView.ViewHolder,
-        p2: RecyclerView.ViewHolder
+        p0: androidx.recyclerview.widget.RecyclerView,
+        p1: androidx.recyclerview.widget.RecyclerView.ViewHolder,
+        p2: androidx.recyclerview.widget.RecyclerView.ViewHolder
     ): Boolean {
         return false
     }
 
-    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+    override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, direction: Int) {
         if (//(direction == ItemTouchHelper.LEFT)  ||
             (direction == ItemTouchHelper.RIGHT)) {
             val id = viewHolder.adapterPosition ?: return

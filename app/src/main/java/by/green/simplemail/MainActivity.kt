@@ -1,28 +1,24 @@
 package by.green.simplemail
 
 import android.app.Activity
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.NavigationView
-import android.support.v4.view.GravityCompat
-import android.support.v4.widget.DrawerLayout
-import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.AdapterView
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.Spinner
+import android.widget.*
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.view.GravityCompat
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import by.green.simplemail.db.Email
 import by.green.simplemail.db.EmailAccount
 import by.green.simplemail.db.EmailFolder
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.navigation.NavigationView
 
 
 class MainActivity : AppCompatActivity(),
@@ -38,6 +34,8 @@ class MainActivity : AppCompatActivity(),
     private var mAccounts: List<EmailAccount>? = null
     private var mFolders: List<EmailFolder>? = null
     private var mEmailsObserver: Observer<List<Email>>? = null
+    private lateinit var mTvEmailTitle: TextView
+    private lateinit var mTvFolderTitle :TextView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +43,8 @@ class MainActivity : AppCompatActivity(),
         setContentView(R.layout.activity_main)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
+        mTvEmailTitle = toolbar.findViewById(R.id.email_title)
+        mTvFolderTitle = toolbar.findViewById(R.id.folder_title)
 
         mPresenter = ViewModelProviders.of(this).get(EmailsDataPresenter::class.java)
         mPresenter.onViewCreated(this)
@@ -56,7 +55,8 @@ class MainActivity : AppCompatActivity(),
             startActivity(intent)
         }
 
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
+        val drawerLayout: androidx.drawerlayout.widget.DrawerLayout =
+            findViewById(R.id.drawer_layout)
         mNavView = findViewById(R.id.nav_view)
         val toggle = ActionBarDrawerToggle(
             this,
@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity(),
 
 
         val view = mNavView.getHeaderView(0)
-        mSpinner = view.findViewById<Spinner>(R.id.spinner)
+        mSpinner = view.findViewById(R.id.spinner)
         mSettingsBtn = view.findViewById(R.id.btn_settings)
         mSpinner.adapter = mAccountsAdapter
 
@@ -91,6 +91,7 @@ class MainActivity : AppCompatActivity(),
             ) {
                 val item = mAccounts?.get(position)
                 mPresenter.onViewActiveAccountChanged(account = item ?: return)
+                mTvEmailTitle.text = item.email
                 drawerLayout.closeDrawer(GravityCompat.START)
             }
         }
@@ -99,16 +100,10 @@ class MainActivity : AppCompatActivity(),
         btnAddAccount.setOnClickListener {
             newAccount()
         }
-    }
 
-    override fun onStop() {
-        super.onStop()
-    }
-
-    override fun onRestart() {
-        super.onRestart()
 
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -116,6 +111,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
         if ((requestCode == AccountSettingsActivity.C_ADD_ACCOUNT) && (resultCode == Activity.RESULT_OK)) {
             val account = data?.getParcelableExtra<EmailAccount>(AccountSettingsActivity.C_ACCOUNT)
             mPresenter.onEmailAccountAdded(account ?: return)
@@ -158,7 +154,8 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onBackPressed() {
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
+        val drawerLayout: androidx.drawerlayout.widget.DrawerLayout =
+            findViewById(R.id.drawer_layout)
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START)
         } else {
@@ -212,13 +209,16 @@ class MainActivity : AppCompatActivity(),
             }
             if (activeIndex > -1) {
                 mSpinner.setSelection(activeIndex)
+                mTvEmailTitle.text = mAccounts?.get(activeIndex)?.email ?: return@Observer
                 mPresenter.onViewActiveAccountChanged(
                     mAccounts?.get(activeIndex) ?: return@Observer
                 )
             }
             if (it?.size == 0) {
-                val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
+                val drawerLayout: androidx.drawerlayout.widget.DrawerLayout =
+                    findViewById(R.id.drawer_layout)
                 drawerLayout.openDrawer(GravityCompat.START)
+                mTvEmailTitle.text = ""
             }
         }
     }
@@ -228,13 +228,7 @@ class MainActivity : AppCompatActivity(),
             var incomingFolder: EmailFolder? = null
             var incomingItem: MenuItem? = null
             mFolders = it
-            var selectedName = ""
-            for (i in 0 until mNavView.menu.size()) {
-                if (mNavView.menu.getItem(i).isChecked) {
-                    selectedName = mNavView.menu.getItem(i).title.toString()
-                    break
-                }
-            }
+
 
             mNavView.menu.clear()
             var i = 0
@@ -259,23 +253,24 @@ class MainActivity : AppCompatActivity(),
     }
 
 
-    override fun getEmailsObserver(folder: EmailFolder): Observer<List<Email>> {
-        val observer = mEmailsObserver
-        return observer ?: Observer { }
+    override fun getEmailsObserver(folder: EmailFolder): Observer<List<Email>>? {
+        return  mEmailsObserver
     }
 
 
     private fun showEmails(folder: EmailFolder) {
+        mTvFolderTitle.text = folder.name
         val params = Bundle()
         params.putParcelable(EmailsListFragment.FOLDER_PARAM, folder)
         val emailsFragment = EmailsListFragment.getFragment(params)
-        val emailsObserver = emailsFragment as EmailsViewObserver
-        mEmailsObserver = emailsObserver.getEmailObserver()
 
         val fm = supportFragmentManager
         val tran = fm.beginTransaction()
         tran.replace(R.id.frame, emailsFragment)
         tran.commit()
+
+        val emailsObserver = emailsFragment as EmailsViewObserver
+        mEmailsObserver = emailsObserver.getEmailObserver()
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -293,7 +288,8 @@ class MainActivity : AppCompatActivity(),
                 break
             }
         }
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
+        val drawerLayout: androidx.drawerlayout.widget.DrawerLayout =
+            findViewById(R.id.drawer_layout)
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }

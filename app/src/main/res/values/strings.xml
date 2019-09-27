@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">simpleMailApp</string>
+    <string name="app_name">simpleMail</string>
     <string name="ok">OK</string>
     <string name="cancel">cancel</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>

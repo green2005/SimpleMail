@@ -1,11 +1,11 @@
 package by.green.simplemail.db
 
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.PrimaryKey
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-@Entity (tableName = "email_accounts")
+@Entity(tableName = "email_accounts")
 data class EmailAccount(
     @PrimaryKey(autoGenerate = true) var id: Long? = null,
     val email: String,
@@ -16,13 +16,13 @@ data class EmailAccount(
     var outPort: Int?,
     var incomingSecuritySettings: String? = "",
     var outSecuritySettings: String? = "",
-    var isActive:Byte = 0
+    var isActive: Byte = 0
 
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         id = null,
-        email = parcel.readString(),
-        pwd = parcel.readString(),
+        email = parcel.readString() ?: "",
+        pwd = parcel.readString() ?: "",
         incomingServer = parcel.readString(),
         incomingPort = parcel.readInt(),
         outServer = parcel.readString(),
@@ -37,12 +37,12 @@ data class EmailAccount(
         parcel.writeString(email)
         parcel.writeString(pwd)
         parcel.writeString(incomingServer)
-        parcel.writeInt(incomingPort?:0)
+        parcel.writeInt(incomingPort ?: 0)
         parcel.writeString(outServer)
-        parcel.writeInt(outPort?:0)
+        parcel.writeInt(outPort ?: 0)
         parcel.writeString(incomingSecuritySettings)
         parcel.writeString(outSecuritySettings)
-        parcel.writeByte(isActive?:0)
+        parcel.writeByte(isActive ?: 0)
     }
 
     override fun describeContents(): Int {
