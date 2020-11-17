@@ -13,6 +13,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import by.green.simplemail.db.Email
 import by.green.simplemail.db.EmailAccount
@@ -46,7 +47,7 @@ class MainActivity : AppCompatActivity(),
         mTvEmailTitle = toolbar.findViewById(R.id.email_title)
         mTvFolderTitle = toolbar.findViewById(R.id.folder_title)
 
-        mPresenter = ViewModelProviders.of(this).get(EmailsDataPresenter::class.java)
+        mPresenter = ViewModelProvider(this).get(EmailsDataPresenter::class.java)
         mPresenter.onViewCreated(this)
 
         val fab: FloatingActionButton = findViewById(R.id.fab)
@@ -170,10 +171,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        return when (item.itemId) {
+         return when (item.itemId) {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
         }

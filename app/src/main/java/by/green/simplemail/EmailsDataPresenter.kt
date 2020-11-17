@@ -3,14 +3,12 @@ package by.green.simplemail
 import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import by.green.simplemail.db.Email
 import by.green.simplemail.db.EmailAccount
 import by.green.simplemail.db.EmailContentPart
 import by.green.simplemail.db.EmailFolder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 
 class EmailsDataPresenter : EmailsPresenter, ViewModel() {
 
